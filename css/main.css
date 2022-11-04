@@ -1,0 +1,62 @@
+fieldset {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    
+}
+
+fieldset > legend{
+    font-size: 1.5em;  
+    font-family: 'Indie Flower', cursive;  
+}
+
+form label {
+    display: inline-block;
+    margin-right: 1em;
+    width: 120px;
+    text-align: right;
+}
+
+input[type=text] {
+    height: 25px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    width: 200px;
+}
+
+select {
+    height: 25px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    width: 208px;
+}
+
+        
+.div-button, .div-label-input{
+    text-align: center;
+}
+
+form button {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    width: 208px;
+    background-color: rgb(147, 241, 147);
+    color: purple;
+    border: 1px solid black;
+    cursor: pointer;
+    padding: .75em;
+    border-radius: .3em;
+}
+
+h1 {
+    text-align: center;
+}
+
+h1, form label, form button, form input {
+    font-family: 'Indie Flower', cursive;
+}
+
+form button:hover {
+    background-color: orange;
+}
+
