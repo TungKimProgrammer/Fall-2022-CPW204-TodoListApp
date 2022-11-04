@@ -1,29 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToDo List App</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://unpkg.com/js-datepicker/dist/datepicker.min.css">
 </head>
+
 <body>
     <h1>ToDo List</h1>
-    <label for="title">Title</label>
-    <input type="text" id="title">
-    <span>*</span>
-    <br>
+    <form action="">
+        <fieldset id="add-todo-item">
+            <legend>
+                Add Todo Item
+            </legend>
 
-    <label for="due-date">Due Date</label>
-    <input type="text" id="due-date">
-    <span>*</span>
-    <br>
+            <div class="div-label-input">
+                <label for="title">Title</label>
+                <input type="text" id="title">
+                <span>*</span>
+                <br>
 
-    <input type="checkbox">
-    <label for="is-completed">Is Completed?</label>
-    <br>
+                <label for="due-date">Due Date</label>
+                <input type="text" id="due-date">
+                <span>*</span>
+                <br>
 
-    <input type="button" value="Add Todo Item">
-    <button id="addButton" type="button" value="Add Todo Item">Add Todo Item</button>
+                
+                <label for="is-completed">Is Completed?</label>
+                <input type="checkbox">
+                <br>
+            </div>
 
+            <div class="div-button">
+                <!--<input type="button" value="Add Todo Item"> -->
+                <button id="addButton" type="button" value="Add Todo Item">Add Todo Item</button>
+            </div>
+        </fieldset>
+    </form>
+    <script src="js/main.js"></script>
+    <script src="https://unpkg.com/js-datepicker"></script>
+    <script>
+        const picker = datepicker("#due-date");
+        picker.setMin(new Date());
+    </script>
 </body>
+
 </html>
