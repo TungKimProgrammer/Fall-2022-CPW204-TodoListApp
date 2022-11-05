@@ -20,9 +20,11 @@ window.onload = function () {
     specialKeyEventListener("product-price");
     specialKeyEventListener("expiration-date");
 };
-function displayToDoItem(item) {
+function setItemULColor(id) {
 }
-function displayProduct(myProduct) {
+function moveItem() {
+}
+function displayToDoItem(myProduct) {
     createDisplayFrame();
     var displayDiv = getByID("display-div");
     displayDiv.setAttribute("style", "text-align: center;");
@@ -50,28 +52,6 @@ function displayProduct(myProduct) {
     createDisplayLI(ulID, "Product Available: ", orderOptions);
     createDisplayLI(ulID, "-----------------------", "-----------------------");
     changeTextColor(ulID, "expired!", "EXPIRED!", "red");
-}
-function createDisplayFrame() {
-    while (legendCount == 0) {
-        var createFieldset = document.createElement("FIELDSET");
-        document.body.appendChild(createFieldset).setAttribute("id", "display-fieldset");
-        var inventoryFieldset = getByID("display-fieldset");
-        var createLegend = document.createElement("LEGEND");
-        var createTitle = document.createTextNode("Products added:");
-        createLegend.appendChild(createTitle);
-        inventoryFieldset.appendChild(createLegend)
-            .setAttribute("id", "display-legend");
-        var createDiv = document.createElement("div");
-        inventoryFieldset.appendChild(createDiv)
-            .setAttribute("id", "display-div");
-        legendCount++;
-    }
-}
-function createDisplayLI(id, a, b) {
-    var createLI = document.createElement("LI");
-    var createLINote = document.createTextNode(a + b);
-    createLI.appendChild(createLINote);
-    getByID(id).appendChild(createLI);
 }
 function addProduct() {
     addInputEventToClearErrors();
@@ -135,6 +115,29 @@ function specialKeyEventListener(id) {
             clearErrMsg();
         }
     });
+}
+var legendCount = 0;
+function createDisplayFrame() {
+    while (legendCount == 0) {
+        var createFieldset = document.createElement("FIELDSET");
+        document.body.appendChild(createFieldset).setAttribute("id", "display-fieldset");
+        var inventoryFieldset = getByID("display-fieldset");
+        var createLegend = document.createElement("LEGEND");
+        var createTitle = document.createTextNode("ToDo Item added:");
+        createLegend.appendChild(createTitle);
+        inventoryFieldset.appendChild(createLegend)
+            .setAttribute("id", "display-legend");
+        var createDiv = document.createElement("div");
+        inventoryFieldset.appendChild(createDiv)
+            .setAttribute("id", "display-div");
+        legendCount++;
+    }
+}
+function createDisplayLI(id, a, b) {
+    var createLI = document.createElement("LI");
+    var createLINote = document.createTextNode(a + b);
+    createLI.appendChild(createLINote);
+    getByID(id).appendChild(createLI);
 }
 function getByID(id) {
     return document.getElementById(id);

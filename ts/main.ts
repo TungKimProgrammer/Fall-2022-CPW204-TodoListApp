@@ -40,15 +40,21 @@ window.onload = function(){
     */
 }
 
-/**
- * Display given TodoItem on the web
- */
- function displayToDoItem(item:ToDoItem):void {
+// sets color for completed and non-completed item
+function setItemULColor(id:string):void {
 
 }
 
+// Allows user to mark a ToDoItem as completed
+
+// Stores ToDoItems in cookies or web storage
+
+// moves completed and non-completed item
+function moveItem():void{
+
+}
 // display Product
-function displayProduct(myProduct:BabyProduct):void{
+function displayToDoItem(myProduct:ToDoItem):void{
     // create a fieldset to display products added
     createDisplayFrame();
 
@@ -89,48 +95,7 @@ function displayProduct(myProduct:BabyProduct):void{
     changeTextColor(ulID, "expired!", "EXPIRED!", "red"); 
 }
 
-/**
- * create fieldset to display products added,
- * the last one show on top of the list
- */
- function createDisplayFrame():void{
-    while (legendCount == 0){
-        // create and add fieldset to form to display Products
-        let createFieldset = document.createElement("FIELDSET");
-        document.body.appendChild(createFieldset).setAttribute("id","display-fieldset");
-        
-        let inventoryFieldset = getByID("display-fieldset");
 
-        // create <legend>Inventory</legend>
-        // add <legend>Inventory</legend> in the <fieldset id="inventory">
-        let createLegend = document.createElement("LEGEND");
-        let createTitle = document.createTextNode("Products added:");
-
-        createLegend.appendChild(createTitle);
-
-        inventoryFieldset.appendChild(createLegend)
-                         .setAttribute("id","display-legend");
-
-        let createDiv = document.createElement("div");
-        inventoryFieldset.appendChild(createDiv)
-                         .setAttribute("id","display-div");
-            
-        legendCount++;
-    }
-}
-
-/**
- * create li line to display product info
- * @param id of ul of current product
- * @param a Title/Field such as Product Name
- * @param b name of specific product
- */
- function createDisplayLI(id: string, a:string, b:string){
-    let createLI = document.createElement("LI");
-    let createLINote = document.createTextNode(a + b);
-    createLI.appendChild(createLINote);
-    getByID(id).appendChild(createLI);
-}
 
 /**
  * add ToDoItem to database when all conditions are met
@@ -216,8 +181,6 @@ function createErrLI(id: string, s:string):void {
     getByID("expiration-date").addEventListener("input", clearErrMsg);
 }
 
-
-
 /**
  * execute functions when particular key entered
  * @param event of key pressed
@@ -244,6 +207,52 @@ function createErrLI(id: string, s:string):void {
         }
     });
 }
+
+/**
+ * create fieldset to display products added,
+ * the last one show on top of the list
+ */
+ var legendCount = 0; 
+ function createDisplayFrame():void{
+    while (legendCount == 0){
+        // create and add fieldset to form to display Products
+        let createFieldset = document.createElement("FIELDSET");
+        document.body.appendChild(createFieldset).setAttribute("id","display-fieldset");
+        
+        let inventoryFieldset = getByID("display-fieldset");
+
+        // create <legend>Inventory</legend>
+        // add <legend>Inventory</legend> in the <fieldset id="inventory">
+        let createLegend = document.createElement("LEGEND");
+        let createTitle = document.createTextNode("ToDo Item added:");
+
+        createLegend.appendChild(createTitle);
+
+        inventoryFieldset.appendChild(createLegend)
+                         .setAttribute("id","display-legend");
+
+        let createDiv = document.createElement("div");
+        inventoryFieldset.appendChild(createDiv)
+                         .setAttribute("id","display-div");
+            
+        legendCount++;
+    }
+}
+
+/**
+ * create li line to display product info
+ * @param id of ul of current product
+ * @param a Title/Field such as Product Name
+ * @param b name of specific product
+ */
+ function createDisplayLI(id: string, a:string, b:string){
+    let createLI = document.createElement("LI");
+    let createLINote = document.createTextNode(a + b);
+    createLI.appendChild(createLINote);
+    getByID(id).appendChild(createLI);
+}
+
+
 
 /**
  * short version of document.getElementById()
