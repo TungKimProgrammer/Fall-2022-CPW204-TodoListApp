@@ -78,7 +78,6 @@ function displaySpecificItemList(s, list) {
         createUL.setAttribute("style", "padding-left: 20px;");
         DisplayDiv.appendChild(createUL);
         createDisplayLI(ulID, "Title: ", list[index].title);
-        console.log(list[index].dueDate);
         createDisplayLI(ulID, "Due Date: ", list[index].dueDate.toDateString());
         if (list[index].isComplete) {
             createLiWithChkBx(ulID, s, index, "Is completed? ");
@@ -102,7 +101,7 @@ function getToDoItem() {
     return item;
 }
 function addToDoItem() {
-    addInputEventToClearErrors();
+    addInputEventToClearErrMsg();
     if (isValid()) {
         var item = getToDoItem();
         if (item.isComplete) {
@@ -119,7 +118,7 @@ function addToDoItem() {
     }
 }
 function isValid() {
-    addInputEventToClearErrors();
+    addInputEventToClearErrMsg();
     var title = getInputValueByID("title").trim();
     var dueDate = getInputValueByID("due-date").trim();
     var month = parseInt(dueDate.substring(0, dueDate.indexOf("/")));
@@ -138,16 +137,16 @@ function isValid() {
     else {
         createErrorDisplay();
         if (title == "") {
-            createErrLI("validationUL", "Title can't be empty!");
+            createErrMsgLI("validationUL", "Title can't be empty!");
         }
         if (dueDate == "") {
-            createErrLI("validationUL", "Due date can't be empty!");
+            createErrMsgLI("validationUL", "Due date can't be empty!");
         }
         if (dueDate !== "" && !isValidDate(dueDate)) {
-            createErrLI("validationUL", "Due date is not valid!");
+            createErrMsgLI("validationUL", "Due date is not valid!");
         }
         if (today > date) {
-            createErrLI("validationUL", "The due date has been passed!");
+            createErrMsgLI("validationUL", "The due date has been passed!");
         }
         return false;
     }
@@ -172,7 +171,7 @@ function createErrorDisplay() {
         ulErrCount++;
     }
 }
-function createErrLI(id, s) {
+function createErrMsgLI(id, s) {
     var createLI = document.createElement("LI");
     var createSpan = document.createElement("SPAN");
     var createNote = document.createTextNode(s);
@@ -186,7 +185,7 @@ function clearErrMsg() {
         getByID("validationUL").innerHTML = "";
     }
 }
-function addInputEventToClearErrors() {
+function addInputEventToClearErrMsg() {
     getByID("title").addEventListener("input", clearErrMsg);
     getByID("due-date").addEventListener("input", clearErrMsg);
     getByID("is-complete").addEventListener("input", clearErrMsg);

@@ -63,12 +63,12 @@ function setItemULColor(id: string): void {
 
 }
 
-// Allows user to mark a ToDoItem as complete
-
 // Stores ToDoItems in cookies or web storage
 
-// moves complete and non-complete item
+// Allows user to mark a ToDoItem as complete or incomplete
+// moves complete and non-complete item between two lists
 function updateLists(): void {
+    // check through complete list if any item unmarked, move to incomplete list
     if (completeItemList.length > 0) {
         for (let index1 in completeItemList) {
             let completeChkBxID = "complete" + "-li-" + index1;
@@ -81,7 +81,7 @@ function updateLists(): void {
             }
         }
     }
-    // check through incomplete
+    // check through incomplete list if any item unmarked, move to complete list
     if (incompleteItemList.length > 0) {
         for (let index2 in incompleteItemList) {
             let incompleteChkBxID = "incomplete" + "-li-" + index2;
@@ -97,7 +97,7 @@ function updateLists(): void {
     displayToDoItems();
 }
 
-// display item
+// display list of added ToDoItem
 function displayToDoItems(): void {
     createDisplayFrame();
     if (completeItemList.length >= 1 || incompleteItemList.length >= 1) {
@@ -106,16 +106,21 @@ function displayToDoItems(): void {
     }
 }
 
+/**
+ * display specific "complete" or "incomplete" list
+ * @param s "complete" or "incomplete"
+ * @param list list of complete items or incomplete items
+ */
 function displaySpecificItemList(s: string, list: ToDoItem[]) {
     let DisplayDiv = getByID(s + "-div");
     DisplayDiv.setAttribute("style", "");
     DisplayDiv.innerHTML = "";
 
-    // sort ToDoItems list by due date
+    // sort ToDoItems list by due date, most recent due date on top
     list.sort((a, b) => (a.dueDate >= b.dueDate) ? 1 : -1);
     //completeItemList.sort((a,b) => (a.dueDate > b.dueDate) ? 1 : ((b.dueDate > a.dueDate) ? -1 : 0));
 
-    // create and add ul list with item details 
+    // create and add one ul foreach item  
     for (var index in list) {
         let ulID = s + "-ul-" + index;
         let createUL = document.createElement("ul");        
@@ -124,8 +129,9 @@ function displaySpecificItemList(s: string, list: ToDoItem[]) {
         DisplayDiv.appendChild(createUL);
 
         createDisplayLI(ulID, "Title: ", list[index].title);
-        console.log(list[index].dueDate);
         createDisplayLI(ulID, "Due Date: ", list[index].dueDate.toDateString());
+        
+        // check isComplete to add li with checkbox
         if (list[index].isComplete) {
             //createDisplayLI(ulID, "Status: ", "COMPLETED");
             createLiWithChkBx(ulID, s, index, "Is completed? ");
@@ -150,6 +156,7 @@ function getToDoItem(): ToDoItem {
     let dueDate = getInputValueByID("due-date");
     let isComplete = getInputByID("is-complete").checked;
 
+    // get year, month, day from input to generate a date for object ToDoItem
     let month = parseInt(dueDate.substring(0, dueDate.indexOf("/")));
     let day = parseInt(dueDate.substring(dueDate.indexOf("/") + 1, dueDate.lastIndexOf("/")));
     let year = parseInt(dueDate.substring(dueDate.lastIndexOf("/") + 1));
@@ -164,7 +171,7 @@ function getToDoItem(): ToDoItem {
  * add ToDoItem to database when all conditions are met
  */
 function addToDoItem(): void {
-    addInputEventToClearErrors();
+    addInputEventToClearErrMsg();
     if (isValid()) {
         let item = getToDoItem();
         if (item.isComplete) {
@@ -178,9 +185,6 @@ function addToDoItem(): void {
             console.log(item);
         }
         (<HTMLFormElement>getByID("myForm")).reset();
-
-        //displayToDoItem(item);
-
     }
 }
 
@@ -189,7 +193,7 @@ function addToDoItem(): void {
  */
 function isValid(): boolean {
 
-    addInputEventToClearErrors();
+    addInputEventToClearErrMsg();
     let title = getInputValueByID("title").trim();
     let dueDate = getInputValueByID("due-date").trim();
 
@@ -213,16 +217,16 @@ function isValid(): boolean {
     else {
         createErrorDisplay();
         if (title == "") {
-            createErrLI("validationUL", "Title can't be empty!");
+            createErrMsgLI("validationUL", "Title can't be empty!");
         }
         if (dueDate == "") {
-            createErrLI("validationUL", "Due date can't be empty!");
+            createErrMsgLI("validationUL", "Due date can't be empty!");
         }
         if (dueDate !== "" && !isValidDate(dueDate)) {
-            createErrLI("validationUL", "Due date is not valid!");
+            createErrMsgLI("validationUL", "Due date is not valid!");
         }
         if (today > date) {
-            createErrLI("validationUL", "The due date has been passed!");
+            createErrMsgLI("validationUL", "The due date has been passed!");
         }
         return false;
     }
@@ -269,7 +273,7 @@ function createErrorDisplay(): void {
  * @param id of validation ul
  * @param s message to display
  */
-function createErrLI(id: string, s: string): void {
+function createErrMsgLI(id: string, s: string): void {
     let createLI = document.createElement("LI");
     let createSpan = document.createElement("SPAN");
     let createNote = document.createTextNode(s);
@@ -291,14 +295,14 @@ function clearErrMsg(): void {
 /**
  * function that clears error messages user starts typing 
  */
-function addInputEventToClearErrors() {
+function addInputEventToClearErrMsg() {
     getByID("title").addEventListener("input", clearErrMsg);
     getByID("due-date").addEventListener("input", clearErrMsg);
     getByID("is-complete").addEventListener("input", clearErrMsg);
 }
 
 /**
- * execute functions when particular key entered
+ * execute functions when "Enter" or "ESC" key entered
  * @param event of key pressed
  */
 function specialKeyEventListener(id: string): void {
