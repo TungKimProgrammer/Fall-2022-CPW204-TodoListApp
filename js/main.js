@@ -68,13 +68,14 @@ function displayToDoItems() {
 }
 function displaySpecificItemList(s, list) {
     var DisplayDiv = getByID(s + "-div");
-    DisplayDiv.setAttribute("style", "text-align: center;");
+    DisplayDiv.setAttribute("style", "");
     DisplayDiv.innerHTML = "";
-    list.sort(function (a, b) { return (a.dueDate > b.dueDate) ? 1 : -1; });
+    list.sort(function (a, b) { return (a.dueDate >= b.dueDate) ? 1 : -1; });
     for (var index in list) {
         var ulID = s + "-ul-" + index;
         var createUL = document.createElement("ul");
         createUL.setAttribute("id", ulID);
+        createUL.setAttribute("style", "padding-left: 20px;");
         DisplayDiv.appendChild(createUL);
         createDisplayLI(ulID, "Title: ", list[index].title);
         console.log(list[index].dueDate);
@@ -236,7 +237,6 @@ function createFieldset(s) {
     displayFrameDiv.appendChild(createFieldset);
     var fieldset = getByID(s + "-fieldset");
     var fieldsetClass = document.getElementsByClassName(s + "-fieldset");
-    var legendCount = fieldsetClass[0].childElementCount;
     var createLegend = document.createElement("LEGEND");
     var legendTitle = s.charAt(0).toUpperCase() + s.slice(1);
     var createTitle = document.createTextNode(legendTitle + " Items");
@@ -249,6 +249,7 @@ function createFieldset(s) {
 }
 function createDisplayLI(id, a, b) {
     var createLI = document.createElement("LI");
+    createLI.setAttribute("style", "");
     var createLINote = document.createTextNode(a + b);
     createLI.appendChild(createLINote);
     getByID(id).appendChild(createLI);

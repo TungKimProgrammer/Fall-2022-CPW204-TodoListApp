@@ -108,18 +108,19 @@ function displayToDoItems(): void {
 
 function displaySpecificItemList(s: string, list: ToDoItem[]) {
     let DisplayDiv = getByID(s + "-div");
-    DisplayDiv.setAttribute("style", "text-align: center;");
+    DisplayDiv.setAttribute("style", "");
     DisplayDiv.innerHTML = "";
 
     // sort ToDoItems list by due date
-    list.sort((a, b) => (a.dueDate > b.dueDate) ? 1 : -1);
+    list.sort((a, b) => (a.dueDate >= b.dueDate) ? 1 : -1);
     //completeItemList.sort((a,b) => (a.dueDate > b.dueDate) ? 1 : ((b.dueDate > a.dueDate) ? -1 : 0));
 
     // create and add ul list with item details 
     for (var index in list) {
         let ulID = s + "-ul-" + index;
-        let createUL = document.createElement("ul");
+        let createUL = document.createElement("ul");        
         createUL.setAttribute("id", ulID);
+        createUL.setAttribute("style", "padding-left: 20px;");
         DisplayDiv.appendChild(createUL);
 
         createDisplayLI(ulID, "Title: ", list[index].title);
@@ -368,7 +369,6 @@ function createFieldset(s: string): void {
     let fieldset = getByID(s + "-fieldset");
 
     let fieldsetClass = document.getElementsByClassName(s + "-fieldset");
-    let legendCount = fieldsetClass[0].childElementCount;
 
 
     // create <legend>s + Items</legend>
@@ -395,6 +395,7 @@ function createFieldset(s: string): void {
  */
 function createDisplayLI(id: string, a: string, b: string) {
     let createLI = document.createElement("LI");
+    createLI.setAttribute("style","");
     let createLINote = document.createTextNode(a + b);
     createLI.appendChild(createLINote);
     getByID(id).appendChild(createLI);
