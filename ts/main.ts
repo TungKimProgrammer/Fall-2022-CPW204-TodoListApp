@@ -29,10 +29,15 @@ var incompleteLegendCount = 0;
 
 window.onload = function () {
     let addBtn = <HTMLElement>getByID("addButton");
-    //addBtn.onclick = additem;
+    let updateBtn = <HTMLElement>getByID("updateButton");
+    //addBtn.onclick = addToDoItem;
 
     addBtn.addEventListener("click", clearErrMsg);
     addBtn.addEventListener("click", main);
+    updateBtn.addEventListener("click", updateLists);
+
+    let grabChkBoxes = document.querySelectorAll("input[name=checkbox]");
+    //grabChkBoxes.addEventListener("click", main);
 
     // button clicked when 'Enter' key pressed
     // form reset and err msg cleared when 'ESC' key pressed
@@ -42,7 +47,7 @@ window.onload = function () {
     /* 
         addBtn.onclick = () => {
             clearErrMsg();
-            additem();
+            addToDoItem();
         }
     */
 }
@@ -50,6 +55,7 @@ window.onload = function () {
 
 function main(): void {
     addToDoItem();
+    setTimeout(() => { displayToDoItems(); }, 500)
 }
 
 // sets color for complete and non-complete item
@@ -62,8 +68,33 @@ function setItemULColor(id: string): void {
 // Stores ToDoItems in cookies or web storage
 
 // moves complete and non-complete item
-function moveItem(): void {
-
+function updateLists(): void {
+    if (completeItemList.length > 0) {
+        for (let index1 in completeItemList) {
+            let completeChkBxID = "complete" + "-li-" + index1;
+            if (!getInputByID(completeChkBxID).checked) { // if unchecked, move to incomplete list
+                completeItemList[index1].isComplete = false;
+                let temp1 = completeItemList[index1];
+                incompleteItemList.push(temp1);
+                completeItemList.splice(parseInt(index1), 1);
+                displaySpecificItemList("incomplete", incompleteItemList);
+            }
+        }
+    }
+    // check through incomplete
+    if (incompleteItemList.length > 0) {
+        for (let index2 in incompleteItemList) {
+            let incompleteChkBxID = "incomplete" + "-li-" + index2;
+            if (getInputByID(incompleteChkBxID).checked) { // if checked, move to complete list
+                incompleteItemList[index2].isComplete = true;
+                let temp2 = incompleteItemList[index2];
+                completeItemList.push(temp2);
+                incompleteItemList.splice(parseInt(index2), 1);
+                displaySpecificItemList("complete", completeItemList);
+            }
+        }
+    }
+    displayToDoItems();
 }
 
 // display item
@@ -91,7 +122,6 @@ function displaySpecificItemList(s: string, list: ToDoItem[]) {
         createUL.setAttribute("id", ulID);
         DisplayDiv.appendChild(createUL);
 
-        createDisplayLI(ulID, "Item ", index + 1);
         createDisplayLI(ulID, "Title: ", list[index].title);
         console.log(list[index].dueDate);
         createDisplayLI(ulID, "Due Date: ", list[index].dueDate.toDateString());
@@ -105,7 +135,7 @@ function displaySpecificItemList(s: string, list: ToDoItem[]) {
             createLiWithChkBx(ulID, s, index, "Is completed? ");
             getInputByID(s + "-li-" + index).checked = false;
         }
-        createDisplayLI(ulID, "-----------------------", "-----------------------");
+        createDisplayLI(ulID, "-----------------------", "");
     }
 }
 
@@ -113,7 +143,7 @@ function displaySpecificItemList(s: string, list: ToDoItem[]) {
 /**
  * Get all input from the form and assign to a ToDoItem object
  */
- function getToDoItem(): ToDoItem {
+function getToDoItem(): ToDoItem {
     // get data from the form
     let title = getInputValueByID("title").trim();
     let dueDate = getInputValueByID("due-date");
@@ -143,13 +173,13 @@ function addToDoItem(): void {
         }
         else {
             incompleteItemList.push(item);
-            console.log("incomplete"+incompleteItemList);
+            console.log("incomplete" + incompleteItemList);
             console.log(item);
         }
         (<HTMLFormElement>getByID("myForm")).reset();
-        setTimeout(() => { displayToDoItems(); },500)
+
         //displayToDoItem(item);
-        
+
     }
 }
 
@@ -157,7 +187,7 @@ function addToDoItem(): void {
  * Checks form data is valid
  */
 function isValid(): boolean {
-    
+
     addInputEventToClearErrors();
     let title = getInputValueByID("title").trim();
     let dueDate = getInputValueByID("due-date").trim();
@@ -298,12 +328,15 @@ function specialKeyEventListener(id: string): void {
  */
 function createDisplayFrame(): void {
     // create a div to display ToDoItems
-    let createDisplayFrameDiv = document.createElement("DIV");
-    createDisplayFrameDiv.setAttribute("id", "display-frame-div");
-    createDisplayFrameDiv.setAttribute("style", "display: table; \
-                                                 margin: auto; \
-                                                 width: 100%");
-    document.body.appendChild(createDisplayFrameDiv);
+    if (incompleteLegendCount < 1 && completeLegendCount < 1) {
+        let createDisplayFrameDiv = document.createElement("DIV");
+        createDisplayFrameDiv.setAttribute("id", "display-frame-div");
+        createDisplayFrameDiv.setAttribute("style", "display: table; \
+                                                    margin: auto; \
+                                                    width: 55%");
+        document.body.appendChild(createDisplayFrameDiv);
+    }
+
     if (incompleteLegendCount < 1) { // prevent creating multiple <legend>
         createFieldset("incomplete");
         incompleteLegendCount++
@@ -325,7 +358,11 @@ function createFieldset(s: string): void {
     let createFieldset = document.createElement("FIELDSET");
     createFieldset.setAttribute("id", s + "-fieldset");
     createFieldset.setAttribute("class", s + "-fieldset");
-    createFieldset.setAttribute("style", "display: table-cell;");
+    createFieldset.setAttribute("style", "display: table-column; \
+                                          box-sizing: border-box; \
+                                          float: left; \
+                                          height: 600px; \
+                                          padding: 10px;");
     displayFrameDiv.appendChild(createFieldset);
 
     let fieldset = getByID(s + "-fieldset");
@@ -369,7 +406,7 @@ function createDisplayLI(id: string, a: string, b: string) {
  * @param s "complete" or "incomplete"
  * @param text extra information to display
  */
- function createLiWithChkBx(ulID: string, s: string, index: string, text: string) {
+function createLiWithChkBx(ulID: string, s: string, index: string, text: string) {
     let chkBxID = s + "-li-" + index;
     let createLI = document.createElement("LI");
     let createLINote = document.createTextNode(text);
@@ -377,6 +414,7 @@ function createDisplayLI(id: string, a: string, b: string) {
     let createChkBx = document.createElement("input");
     createChkBx.setAttribute("id", chkBxID);
     createChkBx.setAttribute("type", "checkbox");
+    createChkBx.setAttribute("name", "check-box");
     getByID(ulID).appendChild(createLI).appendChild(createChkBx);;
 }
 

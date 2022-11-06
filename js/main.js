@@ -18,17 +18,46 @@ var completeLegendCount = 0;
 var incompleteLegendCount = 0;
 window.onload = function () {
     var addBtn = getByID("addButton");
+    var updateBtn = getByID("updateButton");
     addBtn.addEventListener("click", clearErrMsg);
     addBtn.addEventListener("click", main);
+    updateBtn.addEventListener("click", updateLists);
+    var grabChkBoxes = document.querySelectorAll("input[name=checkbox]");
     specialKeyEventListener("title");
     specialKeyEventListener("due-date");
 };
 function main() {
     addToDoItem();
+    setTimeout(function () { displayToDoItems(); }, 500);
 }
 function setItemULColor(id) {
 }
-function moveItem() {
+function updateLists() {
+    if (completeItemList.length > 0) {
+        for (var index1 in completeItemList) {
+            var completeChkBxID = "complete" + "-li-" + index1;
+            if (!getInputByID(completeChkBxID).checked) {
+                completeItemList[index1].isComplete = false;
+                var temp1 = completeItemList[index1];
+                incompleteItemList.push(temp1);
+                completeItemList.splice(parseInt(index1), 1);
+                displaySpecificItemList("incomplete", incompleteItemList);
+            }
+        }
+    }
+    if (incompleteItemList.length > 0) {
+        for (var index2 in incompleteItemList) {
+            var incompleteChkBxID = "incomplete" + "-li-" + index2;
+            if (getInputByID(incompleteChkBxID).checked) {
+                incompleteItemList[index2].isComplete = true;
+                var temp2 = incompleteItemList[index2];
+                completeItemList.push(temp2);
+                incompleteItemList.splice(parseInt(index2), 1);
+                displaySpecificItemList("complete", completeItemList);
+            }
+        }
+    }
+    displayToDoItems();
 }
 function displayToDoItems() {
     createDisplayFrame();
@@ -47,7 +76,6 @@ function displaySpecificItemList(s, list) {
         var createUL = document.createElement("ul");
         createUL.setAttribute("id", ulID);
         DisplayDiv.appendChild(createUL);
-        createDisplayLI(ulID, "Item ", index + 1);
         createDisplayLI(ulID, "Title: ", list[index].title);
         console.log(list[index].dueDate);
         createDisplayLI(ulID, "Due Date: ", list[index].dueDate.toDateString());
@@ -59,7 +87,7 @@ function displaySpecificItemList(s, list) {
             createLiWithChkBx(ulID, s, index, "Is completed? ");
             getInputByID(s + "-li-" + index).checked = false;
         }
-        createDisplayLI(ulID, "-----------------------", "-----------------------");
+        createDisplayLI(ulID, "-----------------------", "");
     }
 }
 function getToDoItem() {
@@ -87,7 +115,6 @@ function addToDoItem() {
             console.log(item);
         }
         getByID("myForm").reset();
-        setTimeout(function () { displayToDoItems(); }, 500);
     }
 }
 function isValid() {
@@ -179,12 +206,14 @@ function specialKeyEventListener(id) {
     });
 }
 function createDisplayFrame() {
-    var createDisplayFrameDiv = document.createElement("DIV");
-    createDisplayFrameDiv.setAttribute("id", "display-frame-div");
-    createDisplayFrameDiv.setAttribute("style", "display: table; \
-                                                 margin: auto; \
-                                                 width: 100%");
-    document.body.appendChild(createDisplayFrameDiv);
+    if (incompleteLegendCount < 1 && completeLegendCount < 1) {
+        var createDisplayFrameDiv = document.createElement("DIV");
+        createDisplayFrameDiv.setAttribute("id", "display-frame-div");
+        createDisplayFrameDiv.setAttribute("style", "display: table; \
+                                                    margin: auto; \
+                                                    width: 55%");
+        document.body.appendChild(createDisplayFrameDiv);
+    }
     if (incompleteLegendCount < 1) {
         createFieldset("incomplete");
         incompleteLegendCount++;
@@ -199,7 +228,11 @@ function createFieldset(s) {
     var createFieldset = document.createElement("FIELDSET");
     createFieldset.setAttribute("id", s + "-fieldset");
     createFieldset.setAttribute("class", s + "-fieldset");
-    createFieldset.setAttribute("style", "display: table-cell;");
+    createFieldset.setAttribute("style", "display: table-column; \
+                                          box-sizing: border-box; \
+                                          float: left; \
+                                          height: 600px; \
+                                          padding: 10px;");
     displayFrameDiv.appendChild(createFieldset);
     var fieldset = getByID(s + "-fieldset");
     var fieldsetClass = document.getElementsByClassName(s + "-fieldset");
@@ -228,6 +261,7 @@ function createLiWithChkBx(ulID, s, index, text) {
     var createChkBx = document.createElement("input");
     createChkBx.setAttribute("id", chkBxID);
     createChkBx.setAttribute("type", "checkbox");
+    createChkBx.setAttribute("name", "check-box");
     getByID(ulID).appendChild(createLI).appendChild(createChkBx);
     ;
 }
