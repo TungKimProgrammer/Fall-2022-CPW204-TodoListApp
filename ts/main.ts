@@ -52,7 +52,6 @@ window.onload = function () {
     */
 }
 
-
 function main(): void {
     addToDoItem();
     setTimeout(() => { displayToDoItems(); }, 500)
@@ -77,7 +76,7 @@ function updateLists(): void {
                 let temp1 = completeItemList[index1];
                 incompleteItemList.push(temp1);
                 completeItemList.splice(parseInt(index1), 1);
-                displaySpecificItemList("incomplete", incompleteItemList);
+                displaySpecificItemList("incomplete", incompleteItemList); // to create HTML elements for other loop
             }
         }
     }
@@ -90,7 +89,7 @@ function updateLists(): void {
                 let temp2 = incompleteItemList[index2];
                 completeItemList.push(temp2);
                 incompleteItemList.splice(parseInt(index2), 1);
-                displaySpecificItemList("complete", completeItemList);
+                displaySpecificItemList("complete", completeItemList); // to create HTML elements for other loop
             }
         }
     }
