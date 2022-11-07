@@ -68,32 +68,64 @@ function setItemULColor(id: string): void {
 // moves complete and non-complete item between two lists
 function updateLists(): void {
     // check through complete list if any item unmarked, move to incomplete list
+    let completeItemListCopy = completeItemList.slice(0);
+    let incompleteItemListCopy = incompleteItemList.slice(0);
     if (completeItemList.length > 0) {
         for (let index1 in completeItemList) {
             let completeChkBxID = "complete" + "-li-" + index1;
-            if (!getInputByID(completeChkBxID).checked) { // if unchecked, move to incomplete list
+            // if unchecked, set isComplete item to false, insert item into incomplete copy list
+            if (!getInputByID(completeChkBxID).checked) { 
                 completeItemList[index1].isComplete = false;
-                let temp1 = completeItemList[index1];
-                incompleteItemList.push(temp1);
+                incompleteItemListCopy.push(completeItemList[index1]);
+            }
+        }
+        /*
+        for (let index1 in completeItemList) {
+            if (!completeItemList[index1].isComplete) {
                 completeItemList.splice(parseInt(index1), 1);
+                removeDisplayUL("complete", index1); // remove ul of moved item
+                createDisplayFrame();
                 displaySpecificItemList("incomplete", incompleteItemList); // to create HTML elements for other loop
             }
         }
+        */
     }
     // check through incomplete list if any item unmarked, move to complete list
     if (incompleteItemList.length > 0) {
         for (let index2 in incompleteItemList) {
             let incompleteChkBxID = "incomplete" + "-li-" + index2;
-            if (getInputByID(incompleteChkBxID).checked) { // if checked, move to complete list
+            // if checked, set isComplete to true, insert item into complete copy list
+            if (getInputByID(incompleteChkBxID).checked) { 
                 incompleteItemList[index2].isComplete = true;
-                let temp2 = incompleteItemList[index2];
-                completeItemList.push(temp2);
+                completeItemListCopy.push(incompleteItemList[index2]);
+            }
+        }
+        /*
+        for (let index2 in incompleteItemList) {
+            if (incompleteItemList[index2].isComplete) { 
                 incompleteItemList.splice(parseInt(index2), 1);
+                removeDisplayUL("incomplete", index2); // remove ul of moved item
+                createDisplayFrame();
                 displaySpecificItemList("complete", completeItemList); // to create HTML elements for other loop
             }
         }
+        */
     }
-    displayToDoItems();
+    // empty 2 original lists and copy everything from copy lists
+    completeItemList = [];
+    incompleteItemList = [];
+    completeItemList = completeItemListCopy.slice(0);
+    incompleteItemList = incompleteItemListCopy.slice(0);
+    // clear display fieldset content
+    getByID("complete-div").innerHTML = "";
+    getByID("incomplete-div").innerHTML = "";
+    displaySpecificItemList("incomplete", incompleteItemList);
+    displaySpecificItemList("complete", completeItemList);
+}
+
+function removeDisplayUL(s: string, index: string) {
+    let ulID = s + "-ul-" + index;
+    getByID(ulID).remove();
 }
 
 // display list of added ToDoItem
@@ -112,7 +144,8 @@ function displayToDoItems(): void {
  */
 function displaySpecificItemList(s: string, list: ToDoItem[]) {
     let DisplayDiv = getByID(s + "-div");
-    DisplayDiv.setAttribute("style", "");
+    DisplayDiv.setAttribute("style", "overflow: auto;");
+
     DisplayDiv.innerHTML = "";
 
     // sort ToDoItems list by due date, most recent due date on top
@@ -366,7 +399,8 @@ function createFieldset(s: string): void {
                                           box-sizing: border-box; \
                                           float: left; \
                                           height: 600px; \
-                                          padding: 10px;");
+                                          padding: 10px; \
+                                          overflow: auto;");
     displayFrameDiv.appendChild(createFieldset);
 
     let fieldset = getByID(s + "-fieldset");
@@ -418,7 +452,8 @@ function createLiWithChkBx(ulID: string, s: string, index: string, text: string)
     let createChkBx = document.createElement("input");
     createChkBx.setAttribute("id", chkBxID);
     createChkBx.setAttribute("type", "checkbox");
-    createChkBx.setAttribute("name", "check-box");
+    createChkBx.setAttribute("name", "checkbox");
+    createChkBx.classList.add("checkbox");
     getByID(ulID).appendChild(createLI).appendChild(createChkBx);;
 }
 

@@ -33,6 +33,8 @@ function main() {
 function setItemULColor(id) {
 }
 function updateLists() {
+    var completeItemListCopy = completeItemList.slice(0);
+    var incompleteItemListCopy = incompleteItemList.slice(0);
     if (completeItemList.length > 0) {
         for (var index1 in completeItemList) {
             var completeChkBxID = "complete" + "-li-" + index1;
@@ -40,7 +42,13 @@ function updateLists() {
                 completeItemList[index1].isComplete = false;
                 var temp1 = completeItemList[index1];
                 incompleteItemList.push(temp1);
+            }
+        }
+        for (var index1 in completeItemList) {
+            if (!completeItemList[index1].isComplete) {
                 completeItemList.splice(parseInt(index1), 1);
+                removeDisplayUL("complete", index1);
+                createDisplayFrame();
                 displaySpecificItemList("incomplete", incompleteItemList);
             }
         }
@@ -52,12 +60,22 @@ function updateLists() {
                 incompleteItemList[index2].isComplete = true;
                 var temp2 = incompleteItemList[index2];
                 completeItemList.push(temp2);
+            }
+        }
+        for (var index2 in incompleteItemList) {
+            if (incompleteItemList[index2].isComplete) {
                 incompleteItemList.splice(parseInt(index2), 1);
+                removeDisplayUL("incomplete", index2);
+                createDisplayFrame();
                 displaySpecificItemList("complete", completeItemList);
             }
         }
     }
     displayToDoItems();
+}
+function removeDisplayUL(s, index) {
+    var ulID = s + "-ul-" + index;
+    getByID(ulID).remove();
 }
 function displayToDoItems() {
     createDisplayFrame();
@@ -68,7 +86,7 @@ function displayToDoItems() {
 }
 function displaySpecificItemList(s, list) {
     var DisplayDiv = getByID(s + "-div");
-    DisplayDiv.setAttribute("style", "");
+    DisplayDiv.setAttribute("style", "overflow: auto;");
     DisplayDiv.innerHTML = "";
     list.sort(function (a, b) { return (a.dueDate >= b.dueDate) ? 1 : -1; });
     for (var index in list) {
@@ -232,7 +250,8 @@ function createFieldset(s) {
                                           box-sizing: border-box; \
                                           float: left; \
                                           height: 600px; \
-                                          padding: 10px;");
+                                          padding: 10px; \
+                                          overflow: auto;");
     displayFrameDiv.appendChild(createFieldset);
     var fieldset = getByID(s + "-fieldset");
     var fieldsetClass = document.getElementsByClassName(s + "-fieldset");
@@ -261,7 +280,8 @@ function createLiWithChkBx(ulID, s, index, text) {
     var createChkBx = document.createElement("input");
     createChkBx.setAttribute("id", chkBxID);
     createChkBx.setAttribute("type", "checkbox");
-    createChkBx.setAttribute("name", "check-box");
+    createChkBx.setAttribute("name", "checkbox");
+    createChkBx.classList.add("checkbox");
     getByID(ulID).appendChild(createLI).appendChild(createChkBx);
     ;
 }
