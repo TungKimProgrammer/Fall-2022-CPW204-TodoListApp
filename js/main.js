@@ -32,48 +32,28 @@ function main() {
 function setItemULColor(id) {
 }
 function updateLists() {
-    var completeItemListCopy = completeItemList.slice();
-    var incompleteItemListCopy = incompleteItemList.slice();
-    var tempMixedItemsList = [];
+    mixedItemList = [];
     if (completeItemList.length > 0) {
         for (var i = 0; i < completeItemList.length; i++) {
             var completeChkBxID = "complete" + "-li-" + i;
             if (!getInputByID(completeChkBxID).checked) {
                 completeItemList[i].isComplete = false;
             }
-            tempMixedItemsList.push(completeItemList[i]);
+            mixedItemList.push(completeItemList[i]);
         }
     }
     if (incompleteItemList.length > 0) {
         for (var i = 0; i < incompleteItemList.length; i++) {
-            var incompleteChkBxID = "incomplete" + "-li-" + index2;
+            var incompleteChkBxID = "incomplete" + "-li-" + i;
             if (getInputByID(incompleteChkBxID).checked) {
-                incompleteItemList[index2].isComplete = true;
-                completeItemListCopy.push(incompleteItemList[index2]);
-                if (incompleteItemListCopy.length > 1) {
-                    incompleteItemListCopy.splice(parseInt(index2), 1);
-                }
-                else {
-                    incompleteItemListCopy = [];
-                }
+                incompleteItemList[i].isComplete = true;
             }
+            mixedItemList.push(incompleteItemList[i]);
         }
     }
-    completeItemList = [];
-    incompleteItemList = [];
-    completeItemList = completeItemListCopy.slice(0);
-    incompleteItemList = incompleteItemListCopy.slice(0);
-    getByID("complete-div").innerHTML = "";
-    getByID("incomplete-div").innerHTML = "";
-    displaySpecificItemList("incomplete", incompleteItemList);
-    displaySpecificItemList("complete", completeItemList);
-}
-function removeDisplayUL(s, index) {
-    var ulID = s + "-ul-" + index;
-    getByID(ulID).remove();
+    displayToDoItems();
 }
 function displayToDoItems() {
-    createDisplayFrame();
     separateItems(mixedItemList);
     if (completeItemList.length >= 1 || incompleteItemList.length >= 1) {
         displaySpecificItemList("complete", completeItemList);
@@ -82,6 +62,8 @@ function displayToDoItems() {
 }
 function separateItems(list) {
     list.sort(function (a, b) { return (a.dueDate >= b.dueDate) ? 1 : -1; });
+    completeItemList = [];
+    incompleteItemList = [];
     for (var i = 0; i < list.length; i++) {
         if (list[i].isComplete) {
             completeItemList.push(list[i]);
@@ -130,6 +112,7 @@ function addToDoItem() {
         var item = getToDoItem();
         mixedItemList.push(item);
         getByID("myForm").reset();
+        createDisplayFrame();
         setTimeout(function () { displayToDoItems(); }, 500);
     }
 }

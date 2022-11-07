@@ -68,80 +68,32 @@ function setItemULColor(id: string): void {
 // Allows user to mark a ToDoItem as complete or incomplete
 // moves complete and non-complete item between two lists
 function updateLists(): void {
-    // check through complete list if any item unmarked, move to incomplete list
-    let completeItemListCopy = completeItemList.slice();
-    let incompleteItemListCopy = incompleteItemList.slice();
-    let tempMixedItemsList: ToDoItem[] = [];
+    mixedItemList = [];
     if (completeItemList.length > 0) {
         for (let i = 0; i< completeItemList.length; i++) {
             let completeChkBxID = "complete" + "-li-" + i;
-            // if unchecked, set isComplete item to false, insert item into incomplete copy list
             if (!getInputByID(completeChkBxID).checked) { 
                 completeItemList[i].isComplete = false;
             }
-            tempMixedItemsList.push(completeItemList[i]);
+            mixedItemList.push(completeItemList[i]);
         }
-        /*
-        for (let i in completeItemList) {
-            if (!completeItemList[i].isComplete) {
-                completeItemList.splice(parseInt(i), 1);
-                removeDisplayUL("complete", i); // remove ul of moved item
-                createDisplayFrame();
-                displaySpecificItemList("incomplete", incompleteItemList); // to create HTML elements for other loop
-            }
-        }
-        */
     }
-    // check through incomplete list if any item unmarked, move to complete list
+
     if (incompleteItemList.length > 0) {
         for (let i = 0; i< incompleteItemList.length; i++) {
-            let incompleteChkBxID = "incomplete" + "-li-" + index2;
-            // if checked, set isComplete to true, insert item into complete copy list
+            let incompleteChkBxID = "incomplete" + "-li-" + i;
             if (getInputByID(incompleteChkBxID).checked) { 
-                incompleteItemList[index2].isComplete = true;
-                completeItemListCopy.push(incompleteItemList[index2]);
-                // when array has 1 element, splice(0,1) returns deleted element
-                if (incompleteItemListCopy.length > 1) {
-                    incompleteItemListCopy.splice(parseInt(index2), 1);
-                }
-                else {
-                    incompleteItemListCopy = [];
-                }
+                incompleteItemList[i].isComplete = true;
             }
+            mixedItemList.push(incompleteItemList[i]);
         }
-        /*
-        for (let index2 in incompleteItemList) {
-            if (incompleteItemList[index2].isComplete) { 
-                incompleteItemList.splice(parseInt(index2), 1);
-                removeDisplayUL("incomplete", index2); // remove ul of moved item
-                createDisplayFrame();
-                displaySpecificItemList("complete", completeItemList); // to create HTML elements for other loop
-            }
-        }
-        */
     }
-    // empty 2 original lists and copy everything from copy lists
-    completeItemList = [];
-    incompleteItemList = [];
-    completeItemList = completeItemListCopy.slice(0);
-    incompleteItemList = incompleteItemListCopy.slice(0);
-    // clear display fieldset content
-    getByID("complete-div").innerHTML = "";
-    getByID("incomplete-div").innerHTML = "";
-    displaySpecificItemList("incomplete", incompleteItemList);
-    displaySpecificItemList("complete", completeItemList);
+
+    displayToDoItems();
 }
-
-function removeDisplayUL(s: string, index: string) {
-    let ulID = s + "-ul-" + index;
-    getByID(ulID).remove();
-}
-
-
 
 // display list of added ToDoItem
 function displayToDoItems(): void {
-    createDisplayFrame();
     separateItems(mixedItemList);
     if (completeItemList.length >= 1 || incompleteItemList.length >= 1) {
         displaySpecificItemList("complete", completeItemList);
@@ -154,6 +106,9 @@ function separateItems(list: ToDoItem[]):void {
     list.sort((a, b) => (a.dueDate >= b.dueDate) ? 1 : -1);
     //completeItemList.sort((a,b) => (a.dueDate > b.dueDate) ? 1 : ((b.dueDate > a.dueDate) ? -1 : 0));
     
+    completeItemList = [];
+    incompleteItemList = [];
+
     // separate complete and incomplete items to two lists
     for (let i = 0; i < list.length; i++ ) {
         if (list[i].isComplete) {
@@ -240,6 +195,7 @@ function addToDoItem(): void {
         }
         */
         (<HTMLFormElement>getByID("myForm")).reset();
+        createDisplayFrame();
         setTimeout(() => { displayToDoItems(); }, 500)
     }
 }
