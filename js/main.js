@@ -12,6 +12,7 @@ var ToDoItem = (function () {
     }
     return ToDoItem;
 }());
+var mixedItemList = [];
 var completeItemList = [];
 var incompleteItemList = [];
 var completeLegendCount = 0;
@@ -22,56 +23,50 @@ window.onload = function () {
     addBtn.addEventListener("click", clearErrMsg);
     addBtn.addEventListener("click", main);
     updateBtn.addEventListener("click", updateLists);
-    var grabChkBoxes = document.querySelectorAll("input[name=checkbox]");
     specialKeyEventListener("title");
     specialKeyEventListener("due-date");
 };
 function main() {
     addToDoItem();
-    setTimeout(function () { displayToDoItems(); }, 500);
 }
 function setItemULColor(id) {
 }
 function updateLists() {
-    var completeItemListCopy = completeItemList.slice(0);
-    var incompleteItemListCopy = incompleteItemList.slice(0);
+    var completeItemListCopy = completeItemList.slice();
+    var incompleteItemListCopy = incompleteItemList.slice();
+    var tempMixedItemsList = [];
     if (completeItemList.length > 0) {
-        for (var index1 in completeItemList) {
-            var completeChkBxID = "complete" + "-li-" + index1;
+        for (var i = 0; i < completeItemList.length; i++) {
+            var completeChkBxID = "complete" + "-li-" + i;
             if (!getInputByID(completeChkBxID).checked) {
-                completeItemList[index1].isComplete = false;
-                var temp1 = completeItemList[index1];
-                incompleteItemList.push(temp1);
+                completeItemList[i].isComplete = false;
             }
-        }
-        for (var index1 in completeItemList) {
-            if (!completeItemList[index1].isComplete) {
-                completeItemList.splice(parseInt(index1), 1);
-                removeDisplayUL("complete", index1);
-                createDisplayFrame();
-                displaySpecificItemList("incomplete", incompleteItemList);
-            }
+            tempMixedItemsList.push(completeItemList[i]);
         }
     }
     if (incompleteItemList.length > 0) {
-        for (var index2 in incompleteItemList) {
+        for (var i = 0; i < incompleteItemList.length; i++) {
             var incompleteChkBxID = "incomplete" + "-li-" + index2;
             if (getInputByID(incompleteChkBxID).checked) {
                 incompleteItemList[index2].isComplete = true;
-                var temp2 = incompleteItemList[index2];
-                completeItemList.push(temp2);
-            }
-        }
-        for (var index2 in incompleteItemList) {
-            if (incompleteItemList[index2].isComplete) {
-                incompleteItemList.splice(parseInt(index2), 1);
-                removeDisplayUL("incomplete", index2);
-                createDisplayFrame();
-                displaySpecificItemList("complete", completeItemList);
+                completeItemListCopy.push(incompleteItemList[index2]);
+                if (incompleteItemListCopy.length > 1) {
+                    incompleteItemListCopy.splice(parseInt(index2), 1);
+                }
+                else {
+                    incompleteItemListCopy = [];
+                }
             }
         }
     }
-    displayToDoItems();
+    completeItemList = [];
+    incompleteItemList = [];
+    completeItemList = completeItemListCopy.slice(0);
+    incompleteItemList = incompleteItemListCopy.slice(0);
+    getByID("complete-div").innerHTML = "";
+    getByID("incomplete-div").innerHTML = "";
+    displaySpecificItemList("incomplete", incompleteItemList);
+    displaySpecificItemList("complete", completeItemList);
 }
 function removeDisplayUL(s, index) {
     var ulID = s + "-ul-" + index;
@@ -79,16 +74,27 @@ function removeDisplayUL(s, index) {
 }
 function displayToDoItems() {
     createDisplayFrame();
+    separateItems(mixedItemList);
     if (completeItemList.length >= 1 || incompleteItemList.length >= 1) {
         displaySpecificItemList("complete", completeItemList);
         displaySpecificItemList("incomplete", incompleteItemList);
+    }
+}
+function separateItems(list) {
+    list.sort(function (a, b) { return (a.dueDate >= b.dueDate) ? 1 : -1; });
+    for (var i = 0; i < list.length; i++) {
+        if (list[i].isComplete) {
+            completeItemList.push(list[i]);
+        }
+        else {
+            incompleteItemList.push(list[i]);
+        }
     }
 }
 function displaySpecificItemList(s, list) {
     var DisplayDiv = getByID(s + "-div");
     DisplayDiv.setAttribute("style", "overflow: auto;");
     DisplayDiv.innerHTML = "";
-    list.sort(function (a, b) { return (a.dueDate >= b.dueDate) ? 1 : -1; });
     for (var index in list) {
         var ulID = s + "-ul-" + index;
         var createUL = document.createElement("ul");
@@ -122,17 +128,9 @@ function addToDoItem() {
     addInputEventToClearErrMsg();
     if (isValid()) {
         var item = getToDoItem();
-        if (item.isComplete) {
-            completeItemList.push(item);
-            console.log("complete" + completeItemList);
-            console.log(item);
-        }
-        else {
-            incompleteItemList.push(item);
-            console.log("incomplete" + incompleteItemList);
-            console.log(item);
-        }
+        mixedItemList.push(item);
         getByID("myForm").reset();
+        setTimeout(function () { displayToDoItems(); }, 500);
     }
 }
 function isValid() {
@@ -144,8 +142,6 @@ function isValid() {
     var year = parseInt(dueDate.substring(dueDate.lastIndexOf("/") + 1));
     var date = new Date(year, month - 1, day + 1);
     var today = new Date();
-    console.log("entered date: " + date);
-    console.log(today);
     if (title !== "" &&
         dueDate !== "" &&
         isValidDate(dueDate) &&

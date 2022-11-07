@@ -22,6 +22,7 @@ class ToDoItem {
     }
 }
 
+var mixedItemList: ToDoItem[] = [];
 var completeItemList: ToDoItem[] = [];
 var incompleteItemList: ToDoItem[] = [];
 var completeLegendCount = 0;
@@ -36,7 +37,7 @@ window.onload = function () {
     addBtn.addEventListener("click", main);
     updateBtn.addEventListener("click", updateLists);
 
-    let grabChkBoxes = document.querySelectorAll("input[name=checkbox]");
+    //let grabChkBoxes = document.querySelectorAll("input[name=checkbox]");
     //grabChkBoxes.addEventListener("click", main);
 
     // button clicked when 'Enter' key pressed
@@ -54,7 +55,7 @@ window.onload = function () {
 
 function main(): void {
     addToDoItem();
-    setTimeout(() => { displayToDoItems(); }, 500)
+    
 }
 
 // sets color for complete and non-complete item
@@ -68,22 +69,23 @@ function setItemULColor(id: string): void {
 // moves complete and non-complete item between two lists
 function updateLists(): void {
     // check through complete list if any item unmarked, move to incomplete list
-    let completeItemListCopy = completeItemList.slice(0);
-    let incompleteItemListCopy = incompleteItemList.slice(0);
+    let completeItemListCopy = completeItemList.slice();
+    let incompleteItemListCopy = incompleteItemList.slice();
+    let tempMixedItemsList: ToDoItem[] = [];
     if (completeItemList.length > 0) {
-        for (let index1 in completeItemList) {
-            let completeChkBxID = "complete" + "-li-" + index1;
+        for (let i = 0; i< completeItemList.length; i++) {
+            let completeChkBxID = "complete" + "-li-" + i;
             // if unchecked, set isComplete item to false, insert item into incomplete copy list
             if (!getInputByID(completeChkBxID).checked) { 
-                completeItemList[index1].isComplete = false;
-                incompleteItemListCopy.push(completeItemList[index1]);
+                completeItemList[i].isComplete = false;
             }
+            tempMixedItemsList.push(completeItemList[i]);
         }
         /*
-        for (let index1 in completeItemList) {
-            if (!completeItemList[index1].isComplete) {
-                completeItemList.splice(parseInt(index1), 1);
-                removeDisplayUL("complete", index1); // remove ul of moved item
+        for (let i in completeItemList) {
+            if (!completeItemList[i].isComplete) {
+                completeItemList.splice(parseInt(i), 1);
+                removeDisplayUL("complete", i); // remove ul of moved item
                 createDisplayFrame();
                 displaySpecificItemList("incomplete", incompleteItemList); // to create HTML elements for other loop
             }
@@ -92,12 +94,19 @@ function updateLists(): void {
     }
     // check through incomplete list if any item unmarked, move to complete list
     if (incompleteItemList.length > 0) {
-        for (let index2 in incompleteItemList) {
+        for (let i = 0; i< incompleteItemList.length; i++) {
             let incompleteChkBxID = "incomplete" + "-li-" + index2;
             // if checked, set isComplete to true, insert item into complete copy list
             if (getInputByID(incompleteChkBxID).checked) { 
                 incompleteItemList[index2].isComplete = true;
                 completeItemListCopy.push(incompleteItemList[index2]);
+                // when array has 1 element, splice(0,1) returns deleted element
+                if (incompleteItemListCopy.length > 1) {
+                    incompleteItemListCopy.splice(parseInt(index2), 1);
+                }
+                else {
+                    incompleteItemListCopy = [];
+                }
             }
         }
         /*
@@ -128,12 +137,31 @@ function removeDisplayUL(s: string, index: string) {
     getByID(ulID).remove();
 }
 
+
+
 // display list of added ToDoItem
 function displayToDoItems(): void {
     createDisplayFrame();
+    separateItems(mixedItemList);
     if (completeItemList.length >= 1 || incompleteItemList.length >= 1) {
         displaySpecificItemList("complete", completeItemList);
         displaySpecificItemList("incomplete", incompleteItemList);
+    }
+}
+
+function separateItems(list: ToDoItem[]):void {
+    // sort ToDoItems list by due date, most recent due date on top
+    list.sort((a, b) => (a.dueDate >= b.dueDate) ? 1 : -1);
+    //completeItemList.sort((a,b) => (a.dueDate > b.dueDate) ? 1 : ((b.dueDate > a.dueDate) ? -1 : 0));
+    
+    // separate complete and incomplete items to two lists
+    for (let i = 0; i < list.length; i++ ) {
+        if (list[i].isComplete) {
+            completeItemList.push(list[i]);
+        }
+        else {
+            incompleteItemList.push(list[i]);
+        }
     }
 }
 
@@ -142,15 +170,11 @@ function displayToDoItems(): void {
  * @param s "complete" or "incomplete"
  * @param list list of complete items or incomplete items
  */
-function displaySpecificItemList(s: string, list: ToDoItem[]) {
+function displaySpecificItemList(s: string, list: ToDoItem[]):void {
     let DisplayDiv = getByID(s + "-div");
     DisplayDiv.setAttribute("style", "overflow: auto;");
 
     DisplayDiv.innerHTML = "";
-
-    // sort ToDoItems list by due date, most recent due date on top
-    list.sort((a, b) => (a.dueDate >= b.dueDate) ? 1 : -1);
-    //completeItemList.sort((a,b) => (a.dueDate > b.dueDate) ? 1 : ((b.dueDate > a.dueDate) ? -1 : 0));
 
     // create and add one ul foreach item  
     for (var index in list) {
@@ -206,17 +230,17 @@ function addToDoItem(): void {
     addInputEventToClearErrMsg();
     if (isValid()) {
         let item = getToDoItem();
+        mixedItemList.push(item);
+        /*
         if (item.isComplete) {
             completeItemList.push(item);
-            console.log("complete" + completeItemList);
-            console.log(item);
         }
         else {
             incompleteItemList.push(item);
-            console.log("incomplete" + incompleteItemList);
-            console.log(item);
         }
+        */
         (<HTMLFormElement>getByID("myForm")).reset();
+        setTimeout(() => { displayToDoItems(); }, 500)
     }
 }
 
@@ -237,8 +261,6 @@ function isValid(): boolean {
     // day counts at 00:00:00, add 1 to day to count the whole day until mid night
     let date = new Date(year, month - 1, day + 1);
     let today = new Date();
-    console.log("entered date: " + date);
-    console.log(today);
 
     if (title !== "" &&
         dueDate !== "" &&
@@ -483,4 +505,6 @@ function getInputByID(id: string) {
 function getInputValueByID(id: string) {
     return (<HTMLInputElement>getByID(id)).value;
 }
+
+
 
